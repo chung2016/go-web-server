@@ -1,24 +1,30 @@
 package main
 
-import "fmt"
+import (
+	f "fmt" // fmt module to f name
+)
 
-func main() {
-	fmt.Println("func")
-	fmt.Println(max(1, 2))
+func init() { // first auto run
+	f.Println("init")
+}
+
+func main() { // secound auto run
+	f.Println("main func")
+	f.Println(max(1, 2))
 
 	var num_sum, num_times = sumAndTimes(1, 2)
 
-	fmt.Println("num_sum: ", num_sum)
-	fmt.Println("num_times: ", num_times)
+	f.Println("num_sum: ", num_sum)
+	f.Println("num_times: ", num_times)
 
 	fncMultiArg(7, 8, 9, 10)
 
 	x := 10
-	fmt.Println("add1(x): ", add1(x))
-	fmt.Println("add2(x): ", add2(&x)) // pass pointer
+	f.Println("add1(x): ", add1(x))
+	f.Println("add2(x): ", add2(&x)) // pass pointer
 
-	fmt.Println("x", x)   // value
-	fmt.Println("&x", &x) // address
+	f.Println("x", x)   // value
+	f.Println("&x", &x) // address
 }
 
 func max(a int, b int) int {
@@ -37,7 +43,7 @@ func sumAndTimes(a int, b int) (sum int, times int) {
 
 func fncMultiArg(arg ...int) {
 	for _, n := range arg {
-		fmt.Printf("And the number is: %d\n", n)
+		f.Printf("And the number is: %d\n", n)
 	}
 }
 
