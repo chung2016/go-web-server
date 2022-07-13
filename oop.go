@@ -44,6 +44,10 @@ func (g Group) String() string { // seems JAVA to string
 	return strings[g]
 }
 
+func (p *Person) SetGroup(g Group) {
+	p.group = g
+}
+
 func main() {
 
 	const (
@@ -76,6 +80,8 @@ func main() {
 		person1,
 		Person{50, Group(BLACK), 150, 50},
 	}
+
+	(person1).SetGroup(Group(RED))
 
 	fmt.Println("Person1 age: ", person1.age)
 	fmt.Println("Person1 group: ", person1.group.String())
