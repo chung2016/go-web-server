@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"regexp"
@@ -22,6 +24,29 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("val:", strings.Join(v, ""))
 	}
 	fmt.Fprintf(w, "Hello astaxie!") // return this string as response
+}
+
+func form(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		crutime := time.Now().Unix()
+		h := md5.New()
+		io.WriteString(h, strconv.FormatInt(crutime, 10))
+		token := fmt.Sprintf("%x", h.Sum(nil))
+		t, _ := template.ParseFiles("form.gtpl")
+		t.Execute(w, token)
+	} else {
+		r.ParseForm()
+		token := r.Form.Get("token")
+		if token != "" {
+			// TODO: check token repeat submit
+		} else {
+			// TODO: no token exception
+		}
+		fmt.Println("username length:", len(r.Form["username"][0]))
+		fmt.Println("username:", template.HTMLEscapeString(r.Form.Get("username"))) //輸出到伺服器端
+		fmt.Println("password:", template.HTMLEscapeString(r.Form.Get("password")))
+		template.HTMLEscape(w, []byte(r.Form.Get("username")))
+	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +75,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 		} else {
 			fmt.Fprintln(w, "is chinese name")
 		}
+		t, _ := template.New("foo").Parse(`{{define "T"}}Hello, {{.}}!{{end}}`)
+		t.ExecuteTemplate(w, "T", template.HTML("<script>alert('you have been pwned')</script>"))
 
 		email := r.Form.Get("email")
 		if !validEmail(email) {
@@ -72,8 +99,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "invalid fruit")
 		}
 
-		t := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
-		fmt.Fprintf(w, "Go launched at %s\n", t.Local())
+		// t := time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
+		// fmt.Fprintf(w, "Go launched at %s\n", t.Local())
 
 		v := r.Form
 		v.Set("name", "Ava")
@@ -131,6 +158,7 @@ func validateAgeReg(age string) bool {
 func main() {
 	http.HandleFunc("/", sayhelloName)
 	http.HandleFunc("/login", login)
+	http.HandleFunc("/form", form)
 	err := http.ListenAndServe(":9090", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
